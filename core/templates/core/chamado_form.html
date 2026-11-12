@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block titulo %}Abrir chamado{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>Abrir chamado</h1>
+    <p class="sutil">{{ condominio.nome }} · {{ condominio.endereco }}</p>
+  </div>
+</div>
+
+<form method="post" class="cartao formulario">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    {% include "core/_campo.html" %}
+  {% endfor %}
+  <p class="sutil">O chamado começa com status <strong>Aberto</strong> e a data de abertura é registrada automaticamente.</p>
+  <div class="acoes">
+    <a class="botao" href="{% url 'chamado_lista' %}">Cancelar</a>
+    <button type="submit" class="botao botao-primario">Abrir chamado</button>
+  </div>
+</form>
+{% endblock %}

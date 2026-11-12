@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+{% block titulo %}Chamado #{{ chamado.pk }}{% endblock %}
+
+{% block conteudo %}
+<a class="voltar" href="{% url 'chamado_lista' %}">← Chamados</a>
+
+<div class="cabecalho-pagina">
+  <div>
+    <span class="numero">Chamado #{{ chamado.pk }}</span>
+    <h1>{{ chamado.get_tipo_display }}</h1>
+  </div>
+  <span class="selo status-{{ chamado.status }}">{{ chamado.get_status_display }}</span>
+</div>
+
+<div class="grade-detalhe">
+  <section class="cartao">
+    <h2 class="cartao-titulo">Dados do chamado</h2>
+    <dl class="dados">
+      <div class="inteiro">
+        <dt>Condomínio</dt>
+        <dd>{{ chamado.condominio }}<br><span class="sutil">{{ chamado.condominio.endereco }}</span></dd>
+      </div>
+      <div><dt>Unidades solicitantes</dt><dd>{{ chamado.unidades.all|join:", " }}</dd></div>
+      <div><dt>Urgência</dt><dd><span class="selo urgencia-{{ chamado.urgencia }}">{{ chamado.get_urgencia_display }}</span></dd></div>
+      <div><dt>Solicitante</dt><dd>{{ chamado.solicitante_nome }}</dd></div>
+      <div><dt>Data de abertura</dt><dd>{{ chamado.data_abertura|date:"d/m/Y H:i" }}</dd></div>
+      <div class="inteiro"><dt>Descrição</dt><dd>{{ chamado.descricao|default:"—"|linebreaksbr }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="cartao">
+    <h2 class="cartao-titulo">Atendimento</h2>
+    <p class="sutil">Síndico: {{ chamado.condominio.sindico_nome }}</p>
+    <form method="post" class="formulario">
+      {% csrf_token %}
+      {% for campo in form %}
+        {% include "core/_campo.html" %}
+      {% endfor %}
+      <button type="submit" class="botao botao-primario botao-bloco">Salvar</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

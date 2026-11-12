@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+{% block titulo %}Cadastrar condomínio{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <h1>Cadastrar condomínio</h1>
+</div>
+
+<form method="post" class="cartao formulario">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <fieldset class="grupo">
+    <legend>Condomínio</legend>
+    {% include "core/_campo.html" with campo=form.nome %}
+    {% include "core/_campo.html" with campo=form.endereco %}
+    {% include "core/_campo.html" with campo=form.numero_unidades %}
+  </fieldset>
+
+  <fieldset class="grupo">
+    <legend>Síndico</legend>
+    {% include "core/_campo.html" with campo=form.sindico_nome %}
+    {% include "core/_campo.html" with campo=form.sindico_telefone %}
+    {% include "core/_campo.html" with campo=form.sindico_email %}
+  </fieldset>
+
+  <div class="acoes">
+    <a class="botao" href="{% url 'condominio_lista' %}">Cancelar</a>
+    <button type="submit" class="botao botao-primario">Cadastrar</button>
+  </div>
+</form>
+{% endblock %}

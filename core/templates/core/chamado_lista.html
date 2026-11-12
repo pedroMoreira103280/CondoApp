@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% block titulo %}Chamados{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <h1>Chamados</h1>
+</div>
+
+<nav class="filtros" aria-label="Filtrar por status">
+  <a href="{% url 'chamado_lista' %}"{% if not status_atual %} aria-current="true"{% endif %}>Todos</a>
+  {% for valor, rotulo in opcoes_status %}
+    <a href="?status={{ valor }}"{% if status_atual == valor %} aria-current="true"{% endif %}>{{ rotulo }}</a>
+  {% endfor %}
+</nav>
+
+{% if chamados %}
+<ul class="lista-cartoes">
+  {% for chamado in chamados %}
+  <li>
+    <a class="cartao cartao-link" href="{% url 'chamado_detalhe' chamado.pk %}">
+      <div class="cartao-topo">
+        <span class="numero">#{{ chamado.pk }}</span>
+        <span class="selo status-{{ chamado.status }}">{{ chamado.get_status_display }}</span>
+      </div>
+      <h2 class="cartao-titulo">{{ chamado.get_tipo_display }}</h2>
+      <p class="sutil">{{ chamado.condominio }} · Unidade{{ chamado.unidades.all|length|pluralize }} {{ chamado.unidades.all|join:", " }}</p>
+      <div class="cartao-rodape">
+        <span class="selo urgencia-{{ chamado.urgencia }}">Urgência {{ chamado.get_urgencia_display|lower }}</span>
+        <span class="sutil">{{ chamado.solicitante_nome }} · {{ chamado.data_abertura|date:"d/m/Y H:i" }}</span>
+      </div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="vazio">
+  <p>{% if status_atual %}Nenhum chamado com este status.{% else %}Nenhum chamado aberto ainda.{% endif %}</p>
+  <a class="botao botao-primario" href="{% url 'chamado_novo' %}">Abrir chamado</a>
+</div>
+{% endif %}
+{% endblock %}

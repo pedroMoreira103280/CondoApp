@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+{% block titulo %}Condomínios{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <h1>Condomínios</h1>
+  <a class="botao" href="{% url 'condominio_novo' %}">+ Cadastrar</a>
+</div>
+
+{% if condominios %}
+<ul class="lista-cartoes">
+  {% for condominio in condominios %}
+  <li class="cartao">
+    <h2 class="cartao-titulo">{{ condominio.nome }}</h2>
+    <p class="sutil">{{ condominio.endereco }}</p>
+    <dl class="dados">
+      <div><dt>Unidades</dt><dd>{{ condominio.numero_unidades }}</dd></div>
+      <div><dt>Chamados</dt><dd>{{ condominio.total_chamados }}</dd></div>
+      <div class="inteiro">
+        <dt>Síndico</dt>
+        <dd>
+          {{ condominio.sindico_nome }}
+          {% if condominio.sindico_telefone %}<br><span class="sutil">{{ condominio.sindico_telefone }}</span>{% endif %}
+          {% if condominio.sindico_email %}<br><span class="sutil">{{ condominio.sindico_email }}</span>{% endif %}
+        </dd>
+      </div>
+    </dl>
+    <a class="botao botao-primario botao-bloco" href="{% url 'chamado_abrir' condominio.pk %}">Abrir chamado</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="vazio">
+  <p>Nenhum condomínio cadastrado ainda.</p>
+  <a class="botao botao-primario" href="{% url 'condominio_novo' %}">Cadastrar condomínio</a>
+</div>
+{% endif %}
+{% endblock %}
