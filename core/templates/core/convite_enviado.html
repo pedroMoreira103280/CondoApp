@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+{% block titulo %}Cadastro enviado{% endblock %}
+
+{% block conteudo %}
+<div class="pagina-estreita">
+  <div class="cartao centro">
+    <h1>Cadastro enviado</h1>
+    <p class="sutil">O síndico de <strong>{{ condominio.nome }}</strong> vai conferir os seus dados. Quando aprovar, entre com o seu e-mail e senha.</p>
+    <a class="botao botao-primario" href="{% url 'entrar' %}">Ir para o login</a>
+  </div>
+</div>
+{% endblock %}

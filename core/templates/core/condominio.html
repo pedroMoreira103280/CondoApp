@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+{% block titulo %}Condomínio{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ condominio.nome }}</h1>
+    <p class="sutil">{{ condominio.endereco }}</p>
+  </div>
+  <a class="botao" href="{% url 'unidades' %}">Unidades ({{ condominio.numero_unidades }})</a>
+</div>
+
+<div class="grade-detalhe">
+  <div class="coluna">
+    <section class="cartao">
+      <h2 class="cartao-titulo">Convide os moradores</h2>
+      <p class="sutil">Envie o link no grupo do WhatsApp ou use o convite impresso com QR code. Quem se cadastrar aparece em <a href="{% url 'moradores' %}">Moradores</a> para você aprovar.</p>
+      <div class="convite">
+        <div class="qrcode" data-qrcode="{{ link }}" data-tamanho="5" aria-label="QR Code do convite">
+          <span class="sutil">O QR Code precisa de internet para ser gerado. O link abaixo funciona sempre.</span>
+        </div>
+        <div class="convite-acoes">
+          <label class="campo">
+            <span>Link de convite</span>
+            <input id="link-convite" type="text" value="{{ link }}" readonly>
+          </label>
+          <div class="acoes acoes-esquerda">
+            <button type="button" class="botao botao-primario" data-copiar="link-convite">Copiar link</button>
+            <a class="botao" target="_blank" rel="noopener" href="https://wa.me/?text={{ "Cadastre-se no CondoApp do "|urlencode }}{{ condominio.nome|urlencode }}{{ ": "|urlencode }}{{ link|urlencode }}">Enviar no WhatsApp</a>
+            <a class="botao" href="{% url 'convite_imprimir' %}">Imprimir aviso</a>
+          </div>
+        </div>
+      </div>
+      <form method="post" action="{% url 'convite_novo' %}" class="form-linha">
+        {% csrf_token %}
+        <button type="submit" class="link-botao">Gerar novo link (o atual deixa de funcionar)</button>
+      </form>
+    </section>
+
+    <section class="cartao">
+      <h2 class="cartao-titulo">Dados do condomínio</h2>
+      <form method="post" class="formulario">
+        {% csrf_token %}
+        {% for campo in form %}
+          {% include "core/_campo.html" %}
+        {% endfor %}
+        <button type="submit" class="botao botao-primario">Salvar</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="coluna">
+    <section class="cartao">
+      <h2 class="cartao-titulo">Implantação</h2>
+      <ol class="passos">
+        {% for texto, feito in passos %}
+          <li class="{% if feito %}passo-feito{% endif %}"><span class="passo-marca" aria-hidden="true">{% if feito %}✓{% else %}{{ forloop.counter }}{% endif %}</span> {{ texto }}{% if feito %}<span class="visualmente-oculto"> (concluído)</span>{% endif %}</li>
+        {% endfor %}
+      </ol>
+      <dl class="dados">
+        <div><dt>Moradores aprovados</dt><dd>{{ total_moradores }}</dd></div>
+        <div><dt>Unidades ativas</dt><dd>{{ unidades_com_morador }} de {{ condominio.numero_unidades }}</dd></div>
+        <div class="inteiro"><dt>Tempo até o primeiro chamado</dt><dd>{% if data_primeiro %}{{ condominio.criado_em|timesince:data_primeiro }}{% else %}—{% endif %}</dd></div>
+      </dl>
+    </section>
+
+    <section class="cartao">
+      <h2 class="cartao-titulo">Síndicos</h2>
+      <ul class="lista-simples">
+        {% for s in condominio.sindicos %}<li>{{ s.nome }}{% if s.telefone %} <span class="sutil">· {{ s.telefone }}</span>{% endif %}</li>{% endfor %}
+      </ul>
+      <p class="sutil">Para dar acesso de síndico a outra pessoa (ex.: subsíndico), edite a conta dela em Moradores.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}{% include "core/_qrcode.html" %}{% endblock %}

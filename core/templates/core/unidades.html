@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+{% block titulo %}Unidades{% endblock %}
+
+{% block conteudo %}
+<a class="voltar" href="{% url 'condominio' %}">← Condomínio</a>
+<div class="cabecalho-pagina">
+  <div>
+    <h1>Casas e apartamentos</h1>
+    <p class="sutil">{{ unidades|length }} unidade{{ unidades|length|pluralize }}</p>
+  </div>
+</div>
+
+<div class="grade-detalhe">
+  <div class="coluna">
+    <form method="post" class="cartao formulario">
+      {% csrf_token %}
+      <h2 class="cartao-titulo">Renomear todas de uma vez</h2>
+      <p class="sutil">Cole ou digite os nomes, um por linha (ex.: copie da planilha do condomínio).</p>
+      {% include "core/_campo.html" with campo=form_renomear.identificadores %}
+      <button type="submit" name="renomear" class="botao botao-primario">Salvar nomes</button>
+    </form>
+
+    <form method="post" class="cartao formulario">
+      {% csrf_token %}
+      {% include "core/_campo.html" with campo=form_nova.identificador %}
+      <button type="submit" name="nova" class="botao">Adicionar unidade</button>
+    </form>
+  </div>
+
+  <section class="cartao">
+    <h2 class="cartao-titulo">Lista</h2>
+    <ul class="lista-unidades">
+      {% for u in unidades %}
+      <li>
+        <span><strong>{{ u.identificador }}</strong> <span class="sutil">· {{ u.total_moradores }} morador{{ u.total_moradores|pluralize:"es" }} · {{ u.total_chamados }} chamado{{ u.total_chamados|pluralize }}</span></span>
+        {% if not u.total_moradores and not u.total_chamados %}
+        <form method="post" action="{% url 'unidade_excluir' u.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="link-botao link-perigo" aria-label="Excluir unidade {{ u.identificador }}">Excluir</button>
+        </form>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

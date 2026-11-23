@@ -1,0 +1,5 @@
+<div class="campo campo-caixa">
+  <label for="{{ campo.id_for_label }}">{{ campo }} {{ rotulo|default:campo.label }}</label>
+  {% if campo.help_text %}<span class="helptext">{{ campo.help_text }}</span>{% endif %}
+  {{ campo.errors }}
+</div>

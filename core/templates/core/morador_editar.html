@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+{% block titulo %}{{ alvo.nome }}{% endblock %}
+
+{% block conteudo %}
+<a class="voltar" href="{% url 'moradores' %}">← Moradores</a>
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ alvo.nome }}</h1>
+    <p class="sutil">Cadastrado em {{ alvo.criado_em|date:"d/m/Y" }}</p>
+  </div>
+</div>
+
+<div class="grade-detalhe">
+  <form method="post" class="cartao formulario">
+    {% csrf_token %}
+    <h2 class="cartao-titulo">Dados e permissões</h2>
+    {{ form.non_field_errors }}
+    {% include "core/_campo.html" with campo=form.nome %}
+    {% include "core/_campo.html" with campo=form.email %}
+    {% include "core/_campo.html" with campo=form.telefone %}
+    {% include "core/_campo.html" with campo=form.unidade %}
+    {% include "core/_campo.html" with campo=form.papel %}
+    {% include "core/_caixa.html" with campo=form.ativo %}
+    <p class="sutil">Síndico tem acesso total ao condomínio: chamados, unidades, moradores e configurações.</p>
+    <button type="submit" name="dados" class="botao botao-primario">Salvar</button>
+  </form>
+
+  <div class="coluna">
+    <form method="post" class="cartao formulario">
+      {% csrf_token %}
+      <h2 class="cartao-titulo">Definir nova senha</h2>
+      <p class="sutil">Para quem esqueceu a senha. Entregue a nova senha pessoalmente.</p>
+      {% include "core/_campo.html" with campo=form_senha.senha %}
+      <button type="submit" name="senha" class="botao">Definir senha</button>
+    </form>
+
+    {% if alvo.pk != perfil.pk %}
+    <section class="cartao">
+      <h2 class="cartao-titulo">Remover conta</h2>
+      <p class="sutil">Apaga a conta. Os chamados continuam no histórico.</p>
+      <a class="botao botao-perigo-contorno" href="{% url 'morador_remover' alvo.pk %}">Remover conta</a>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

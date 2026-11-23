@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block titulo %}Editar chamado #{{ chamado.pk }}{% endblock %}
+
+{% block conteudo %}
+<a class="voltar" href="{% url 'chamado_detalhe' chamado.pk %}">← Chamado #{{ chamado.pk }}</a>
+<div class="cabecalho-pagina">
+  <h1>Editar chamado #{{ chamado.pk }}</h1>
+</div>
+
+<form method="post" class="cartao formulario">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    {% if campo.name == "privado" %}
+      {% include "core/_caixa.html" with rotulo="Chamado privado" %}
+    {% else %}
+      {% include "core/_campo.html" %}
+    {% endif %}
+  {% endfor %}
+  <p class="sutil">As alterações ficam registradas no histórico do chamado.</p>
+  <div class="acoes">
+    <a class="botao botao-perigo-contorno" href="{% url 'chamado_excluir' chamado.pk %}">Excluir chamado</a>
+    <a class="botao" href="{% url 'chamado_detalhe' chamado.pk %}">Cancelar</a>
+    <button type="submit" class="botao botao-primario">Salvar</button>
+  </div>
+</form>
+{% endblock %}

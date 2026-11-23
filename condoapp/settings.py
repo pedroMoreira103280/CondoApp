@@ -44,6 +44,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.contexto.perfil",
             ],
         },
     },
@@ -62,7 +63,7 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -73,5 +74,18 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+
+# Login e sessão
+LOGIN_URL = "entrar"
+LOGIN_REDIRECT_URL = "chamado_lista"
+LOGOUT_REDIRECT_URL = "entrar"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14  # 14 dias
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = "DENY"
+
+# Mensagens de erro com estilo próprio (vermelho)
+from django.contrib.messages import constants as mensagens  # noqa: E402
+MESSAGE_TAGS = {mensagens.ERROR: "erro"}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

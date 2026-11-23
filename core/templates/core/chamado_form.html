@@ -5,20 +5,58 @@
 <div class="cabecalho-pagina">
   <div>
     <h1>Abrir chamado</h1>
-    <p class="sutil">{{ condominio.nome }} · {{ condominio.endereco }}</p>
+    <p class="sutil">{{ perfil.condominio.nome }}{% if not perfil.eh_sindico %} · Unidade {{ perfil.unidade|default:"—" }} · {{ perfil.nome }}{% endif %}</p>
   </div>
 </div>
 
+<div class="grade-form">
 <form method="post" class="cartao formulario">
   {% csrf_token %}
   {{ form.non_field_errors }}
-  {% for campo in form %}
-    {% include "core/_campo.html" %}
-  {% endfor %}
-  <p class="sutil">O chamado começa com status <strong>Aberto</strong> e a data de abertura é registrada automaticamente.</p>
+
+  {% if perfil.eh_sindico %}
+  <fieldset class="grupo">
+    <legend>Quem registra</legend>
+    {% include "core/_campo.html" with campo=form.solicitante_nome %}
+    {% include "core/_campo.html" with campo=form.unidades %}
+  </fieldset>
+  {% endif %}
+
+  <fieldset class="grupo">
+    <legend>Ocorrência</legend>
+    {% include "core/_campo.html" with campo=form.tipo %}
+    {% include "core/_campo.html" with campo=form.local %}
+    {% include "core/_campo.html" with campo=form.urgencia %}
+    {% include "core/_campo.html" with campo=form.descricao %}
+  </fieldset>
+
+  <fieldset class="grupo">
+    <legend>Convivência e privacidade</legend>
+    {% include "core/_campo.html" with campo=form.unidade_envolvida %}
+    {% include "core/_caixa.html" with campo=form.privado rotulo="Chamado privado" %}
+    <p class="sutil">Com uma unidade envolvida, o síndico conduz o caso em etapas: aviso, notificação, defesa e decisão. A unidade envolvida nunca vê quem registrou.</p>
+  </fieldset>
+
+  <p class="sutil">O chamado começa como <strong>Aberto</strong> e a data de abertura é registrada automaticamente.</p>
   <div class="acoes">
     <a class="botao" href="{% url 'chamado_lista' %}">Cancelar</a>
     <button type="submit" class="botao botao-primario">Abrir chamado</button>
   </div>
 </form>
+
+{% if parecidos %}
+<aside class="cartao cartao-sugestao" id="parecidos" hidden>
+  <h2 class="cartao-titulo">Já existe algo parecido?</h2>
+  <p class="sutil">Se for o mesmo problema, abra o chamado e marque <strong>Também estou afetado</strong> em vez de criar outro.</p>
+  <ul class="lista-simples">
+    {% for c in parecidos %}
+    <li data-parecido="{{ c.tipo }}" hidden>
+      <a href="{% url 'chamado_detalhe' c.pk %}">#{{ c.pk }} {{ c.get_tipo_display }} · {{ c.get_local_display }}</a>
+      <span class="sutil">{{ c.get_status_display }} · {{ c.data_abertura|date:"d/m" }}{% if c.afetados.all %} · +{{ c.afetados.all|length }} afetado{{ c.afetados.all|length|pluralize }}{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</aside>
+{% endif %}
+</div>
 {% endblock %}

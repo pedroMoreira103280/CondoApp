@@ -6,38 +6,123 @@
 
 <div class="cabecalho-pagina">
   <div>
-    <span class="numero">Chamado #{{ chamado.pk }}</span>
+    <span class="numero">Chamado #{{ chamado.pk }}{% if chamado.privado %} · <span class="marcador-privado">Privado</span>{% endif %}</span>
     <h1>{{ chamado.get_tipo_display }}</h1>
   </div>
   <span class="selo status-{{ chamado.status }}">{{ chamado.get_status_display }}</span>
 </div>
 
-<div class="grade-detalhe">
-  <section class="cartao">
-    <h2 class="cartao-titulo">Dados do chamado</h2>
-    <dl class="dados">
-      <div class="inteiro">
-        <dt>Condomínio</dt>
-        <dd>{{ chamado.condominio }}<br><span class="sutil">{{ chamado.condominio.endereco }}</span></dd>
-      </div>
-      <div><dt>Unidades solicitantes</dt><dd>{{ chamado.unidades.all|join:", " }}</dd></div>
-      <div><dt>Urgência</dt><dd><span class="selo urgencia-{{ chamado.urgencia }}">{{ chamado.get_urgencia_display }}</span></dd></div>
-      <div><dt>Solicitante</dt><dd>{{ chamado.solicitante_nome }}</dd></div>
-      <div><dt>Data de abertura</dt><dd>{{ chamado.data_abertura|date:"d/m/Y H:i" }}</dd></div>
-      <div class="inteiro"><dt>Descrição</dt><dd>{{ chamado.descricao|default:"—"|linebreaksbr }}</dd></div>
-    </dl>
-  </section>
+{% if relacao == "envolvido" %}
+<p class="aviso aviso-info">Este registro envolve a sua unidade. Por privacidade, você não vê quem registrou. Acompanhe abaixo as mensagens do síndico{% if chamado.etapa == "notificacao" %} e apresente a sua defesa{% endif %}.</p>
+{% endif %}
 
-  <section class="cartao">
-    <h2 class="cartao-titulo">Atendimento</h2>
-    <p class="sutil">Síndico: {{ chamado.condominio.sindico_nome }}</p>
-    <form method="post" class="formulario">
-      {% csrf_token %}
-      {% for campo in form %}
-        {% include "core/_campo.html" %}
+<div class="grade-detalhe">
+  <div class="coluna">
+    <section class="cartao">
+      <h2 class="cartao-titulo">Dados do chamado</h2>
+      <dl class="dados">
+        <div><dt>Local</dt><dd>{{ chamado.get_local_display }}</dd></div>
+        <div><dt>Urgência</dt><dd><span class="selo urgencia-{{ chamado.urgencia }}">{{ chamado.get_urgencia_display }}</span></dd></div>
+        <div><dt>Data de abertura</dt><dd>{{ chamado.data_abertura|date:"d/m/Y H:i" }}</dd></div>
+        {% if relacao == "sindico" or relacao == "solicitante" %}
+          <div><dt>Unidades solicitantes</dt><dd>{{ chamado.unidades.all|join:", " }}</dd></div>
+          <div><dt>Solicitante</dt><dd>{{ chamado.solicitante_nome }}{% if chamado.registrado_pelo_sindico %}<br><span class="sutil">Registrado pelo síndico</span>{% endif %}</dd></div>
+          {% if chamado.unidade_envolvida %}<div><dt>Unidade envolvida</dt><dd>{{ chamado.unidade_envolvida }}</dd></div>{% endif %}
+        {% endif %}
+        {% if chamado.etapa %}<div><dt>Etapa do rito</dt><dd><span class="selo selo-rito">{{ chamado.get_etapa_display }}</span>{% if chamado.resultado %}<br><span class="sutil">{{ chamado.get_resultado_display }}</span>{% endif %}</dd></div>{% endif %}
+        {% if relacao != "envolvido" %}
+          <div><dt>Também afetados</dt><dd>{{ chamado.afetados.all|length }} morador{{ chamado.afetados.all|length|pluralize:"es" }}</dd></div>
+          <div class="inteiro"><dt>Descrição</dt><dd>{{ chamado.descricao|default:"—"|linebreaksbr }}</dd></div>
+        {% endif %}
+      </dl>
+
+      {% if pode_marcar_afetado %}
+        {% if ja_afetado %}
+          <p class="aviso">Você marcou que também está afetado por este problema.</p>
+        {% else %}
+          <form method="post" action="{% url 'chamado_afetado' chamado.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="botao botao-primario botao-bloco">Também estou afetado</button>
+            <p class="sutil centro">Em vez de abrir outro chamado igual, some-se a este. O síndico vê quantos são.</p>
+          </form>
+        {% endif %}
+      {% endif %}
+
+      {% if pode_cancelar %}
+        <form method="post" action="{% url 'chamado_cancelar' chamado.pk %}" class="form-linha">
+          {% csrf_token %}
+          <button type="submit" class="botao botao-perigo-contorno">Cancelar meu chamado</button>
+        </form>
+      {% endif %}
+
+      {% if relacao == "sindico" and chamado.afetados.all %}
+        <p class="sutil"><strong>Afetados:</strong> {% for u in chamado.afetados.all %}{{ u.perfil.nome|default:u.email }}{% if u.perfil.unidade %} ({{ u.perfil.unidade }}){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+      {% endif %}
+    </section>
+
+    <section class="cartao">
+      <h2 class="cartao-titulo">Histórico</h2>
+      {% if historico %}
+      <ol class="linha-tempo">
+        {% for item in historico %}
+        <li class="evento evento-{{ item.obj.tipo }}">
+          <div class="evento-topo">
+            <strong>{{ item.obj.get_tipo_display }}</strong>
+            <span class="sutil">{{ item.obj.data|date:"d/m/Y H:i" }} · {{ item.autor }}</span>
+          </div>
+          {% if item.obj.texto %}<p>{{ item.obj.texto|linebreaksbr }}</p>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+        <p class="sutil">Nada registrado ainda.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="coluna">
+    {% if relacao == "sindico" %}
+    <section class="cartao">
+      <h2 class="cartao-titulo">Atendimento</h2>
+      <form method="post" class="formulario">
+        {% csrf_token %}
+        {% for campo in form %}
+          {% include "core/_campo.html" %}
+        {% endfor %}
+        <button type="submit" class="botao botao-primario botao-bloco">Salvar</button>
+      </form>
+      <div class="acoes acoes-pequenas">
+        <a class="botao" href="{% url 'chamado_editar' chamado.pk %}">Editar todos os campos</a>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if chamado.unidade_envolvida and relacao == "sindico" or relacao == "envolvido" %}
+    <section class="cartao">
+      <h2 class="cartao-titulo">Rito do caso</h2>
+      <ol class="rito">
+        {% for valor, rotulo in chamado.ETAPAS %}{% if valor %}
+          <li class="{% if chamado.etapa == valor %}rito-atual{% endif %}">{{ rotulo }}</li>
+        {% endif %}{% endfor %}
+      </ol>
+      {% for e in etapas %}
+      <form method="post" action="{% url 'chamado_etapa' chamado.pk e.etapa %}" class="formulario etapa">
+        {% csrf_token %}
+        <h3 class="etapa-titulo">{{ e.titulo }}</h3>
+        <p class="sutil">{{ e.ajuda }}</p>
+        {{ e.form.non_field_errors }}
+        {% for campo in e.form %}
+          {% include "core/_campo.html" %}
+        {% endfor %}
+        <button type="submit" class="botao botao-primario">{{ e.titulo }}</button>
+      </form>
+      {% empty %}
+        {% if chamado.encerrado %}<p class="sutil">Caso encerrado.</p>
+        {% elif relacao == "envolvido" %}<p class="sutil">Nenhuma ação sua é necessária agora.</p>
+        {% else %}<p class="sutil">Aguardando a defesa da unidade.</p>{% endif %}
       {% endfor %}
-      <button type="submit" class="botao botao-primario botao-bloco">Salvar</button>
-    </form>
-  </section>
+    </section>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

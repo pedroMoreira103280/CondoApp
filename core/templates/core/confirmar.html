@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% block titulo %}Confirmar{% endblock %}
+
+{% block conteudo %}
+<div class="pagina-estreita">
+  <form method="post" class="cartao formulario">
+    {% csrf_token %}
+    <h1>{{ titulo }}</h1>
+    <p class="sutil">{{ texto }}</p>
+    <div class="acoes">
+      <a class="botao" href="{{ voltar }}">Voltar</a>
+      <button type="submit" class="botao botao-perigo">{{ botao }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

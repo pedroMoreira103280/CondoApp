@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+{% block titulo %}Cadastro de morador{% endblock %}
+
+{% block conteudo %}
+<div class="pagina-estreita">
+  <div class="cabecalho-pagina">
+    <div>
+      <span class="numero">Convite</span>
+      <h1>{{ condominio.nome }}</h1>
+      <p class="sutil">{{ condominio.endereco }}</p>
+    </div>
+  </div>
+
+  <form method="post" class="cartao formulario">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for campo in form %}
+      {% include "core/_campo.html" %}
+    {% endfor %}
+    <p class="sutil">O síndico confere o cadastro antes de liberar o acesso. Assim, só moradores do condomínio entram.</p>
+    <button type="submit" class="botao botao-primario botao-bloco">Enviar cadastro</button>
+  </form>
+  <p class="sutil centro">Já tem conta? <a href="{% url 'entrar' %}">Entrar</a></p>
+</div>
+{% endblock %}

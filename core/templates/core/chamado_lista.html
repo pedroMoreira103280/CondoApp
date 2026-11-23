@@ -6,35 +6,74 @@
   <h1>Chamados</h1>
 </div>
 
+{% if perfil.eh_sindico and pendentes %}
+<a class="cartao cartao-alerta cartao-link" href="{% url 'moradores' %}">
+  <strong>{{ pendentes }} cadastro{{ pendentes|pluralize }} aguardando aprovação</strong>
+  <span class="sutil">Confira e libere o acesso dos moradores.</span>
+</a>
+{% endif %}
+
+{% if sugestoes %}
+<section class="cartao cartao-sugestao">
+  <h2 class="cartao-titulo">Sugestões de manutenção preventiva</h2>
+  <p class="sutil">O mesmo problema voltou várias vezes no mesmo lugar.</p>
+  <ul class="lista-simples">
+    {% for s in sugestoes %}
+    <li>
+      <a href="?tipo={{ s.tipo }}&amp;local={{ s.local }}"><strong>{{ s.tipo_rotulo }}</strong> em <strong>{{ s.local_rotulo }}</strong></a>:
+      {{ s.total }} chamados nos últimos {{ s.dias }} dias. Considere uma manutenção preventiva.
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if not perfil.eh_sindico %}
+<nav class="abas" aria-label="Quais chamados">
+  <a href="{% url 'chamado_lista' %}"{% if not escopo %} aria-current="true"{% endif %}>Do condomínio</a>
+  <a href="?escopo=meus"{% if escopo == "meus" %} aria-current="true"{% endif %}>Meus chamados</a>
+</nav>
+{% endif %}
+
 <nav class="filtros" aria-label="Filtrar por status">
-  <a href="{% url 'chamado_lista' %}"{% if not status_atual %} aria-current="true"{% endif %}>Todos</a>
+  <a href="?{% if escopo %}escopo={{ escopo }}{% endif %}"{% if not status_atual %} aria-current="true"{% endif %}>Todos</a>
   {% for valor, rotulo in opcoes_status %}
-    <a href="?status={{ valor }}"{% if status_atual == valor %} aria-current="true"{% endif %}>{{ rotulo }}</a>
+    <a href="?status={{ valor }}{% if escopo %}&amp;escopo={{ escopo }}{% endif %}"{% if status_atual == valor %} aria-current="true"{% endif %}>{{ rotulo }}</a>
   {% endfor %}
 </nav>
 
-{% if chamados %}
+{% if filtro_tipo or filtro_local %}
+<p class="sutil filtro-ativo">Filtrando: {{ filtro_tipo|default:"" }}{% if filtro_tipo and filtro_local %} em {% endif %}{{ filtro_local|default:"" }} · <a href="{% url 'chamado_lista' %}">limpar</a></p>
+{% endif %}
+
+{% if itens %}
 <ul class="lista-cartoes">
-  {% for chamado in chamados %}
+  {% for item in itens %}{% with chamado=item.obj relacao=item.relacao %}
   <li>
     <a class="cartao cartao-link" href="{% url 'chamado_detalhe' chamado.pk %}">
       <div class="cartao-topo">
-        <span class="numero">#{{ chamado.pk }}</span>
+        <span class="numero">#{{ chamado.pk }}{% if chamado.privado %} · <span class="marcador-privado">Privado</span>{% endif %}</span>
         <span class="selo status-{{ chamado.status }}">{{ chamado.get_status_display }}</span>
       </div>
       <h2 class="cartao-titulo">{{ chamado.get_tipo_display }}</h2>
-      <p class="sutil">{{ chamado.condominio }} · Unidade{{ chamado.unidades.all|length|pluralize }} {{ chamado.unidades.all|join:", " }}</p>
+      <p class="sutil">
+        {{ chamado.get_local_display }}{% if relacao == "sindico" or relacao == "solicitante" %} · Unidade{{ chamado.unidades.all|length|pluralize }} {{ chamado.unidades.all|join:", " }}{% endif %}{% if relacao == "envolvido" %} · Envolve a sua unidade{% endif %}
+      </p>
       <div class="cartao-rodape">
-        <span class="selo urgencia-{{ chamado.urgencia }}">Urgência {{ chamado.get_urgencia_display|lower }}</span>
-        <span class="sutil">{{ chamado.solicitante_nome }} · {{ chamado.data_abertura|date:"d/m/Y H:i" }}</span>
+        <span class="selos">
+          <span class="selo urgencia-{{ chamado.urgencia }}">Urgência {{ chamado.get_urgencia_display|lower }}</span>
+          {% if chamado.etapa %}<span class="selo selo-rito">{{ chamado.get_etapa_display }}</span>{% endif %}
+          {% if chamado.afetados.all %}<span class="selo selo-afetados">+{{ chamado.afetados.all|length }} afetado{{ chamado.afetados.all|length|pluralize }}</span>{% endif %}
+        </span>
+        <span class="sutil">{% if relacao == "sindico" or relacao == "solicitante" %}{{ chamado.solicitante_nome }} · {% endif %}{{ chamado.data_abertura|date:"d/m/Y H:i" }}</span>
       </div>
     </a>
   </li>
-  {% endfor %}
+  {% endwith %}{% endfor %}
 </ul>
 {% else %}
 <div class="vazio">
-  <p>{% if status_atual %}Nenhum chamado com este status.{% else %}Nenhum chamado aberto ainda.{% endif %}</p>
+  <p>{% if status_atual or escopo or filtro_tipo %}Nenhum chamado com este filtro.{% else %}Nenhum chamado aberto ainda.{% endif %}</p>
   <a class="botao botao-primario" href="{% url 'chamado_novo' %}">Abrir chamado</a>
 </div>
 {% endif %}

@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+{% block titulo %}Ocorrências do condomínio{% endblock %}
+
+{% block conteudo %}
+<section class="destaque">
+  <h1>As ocorrências do condomínio organizadas, com histórico e privacidade.</h1>
+  <p class="destaque-texto">O síndico coloca no ar em uma tarde: cadastra o condomínio, as unidades são criadas na hora e os moradores entram por um link ou QR Code. Sem app para instalar, sem taxa de implantação.</p>
+  <div class="acoes acoes-inicio">
+    <a class="botao botao-primario" href="{% url 'cadastro_sindico' %}">Sou síndico: cadastrar condomínio</a>
+    <a class="botao" href="{% url 'entrar' %}">Já tenho conta: entrar</a>
+  </div>
+  <p class="sutil">Morador? Peça ao síndico o link ou o QR Code de convite do seu condomínio.</p>
+</section>
+
+<ul class="lista-cartoes diferenciais">
+  <li class="cartao">
+    <h2 class="cartao-titulo">Implantação em uma tarde</h2>
+    <p class="sutil">Unidades geradas automaticamente, convite por link ou QR Code e acesso pelo navegador do celular.</p>
+  </li>
+  <li class="cartao">
+    <h2 class="cartao-titulo">Privacidade e rito justo</h2>
+    <p class="sutil">Quem reclama não fica exposto ao vizinho. Cada caso segue aviso, notificação, defesa e decisão.</p>
+  </li>
+  <li class="cartao">
+    <h2 class="cartao-titulo">Ninguém fica de fora</h2>
+    <p class="sutil">O síndico registra por quem não usa o app, imprime o aviso com QR Code e pode definir uma nova senha para quem esqueceu.</p>
+  </li>
+  <li class="cartao">
+    <h2 class="cartao-titulo">Ocorrências inteligentes</h2>
+    <p class="sutil">"Também estou afetado" evita chamados repetidos, e problemas que voltam viram sugestão de manutenção preventiva.</p>
+  </li>
+</ul>
+{% endblock %}

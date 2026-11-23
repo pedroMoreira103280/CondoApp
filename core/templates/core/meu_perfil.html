@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+{% block titulo %}Meu perfil{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>Meu perfil</h1>
+    <p class="sutil">{{ perfil.get_papel_display }} · {{ perfil.condominio.nome }}{% if perfil.unidade %} · Unidade {{ perfil.unidade }}{% endif %}</p>
+  </div>
+</div>
+
+<div class="grade-detalhe">
+  <form method="post" class="cartao formulario">
+    {% csrf_token %}
+    <h2 class="cartao-titulo">Meus dados</h2>
+    {% for campo in form_dados %}
+      {% include "core/_campo.html" %}
+    {% endfor %}
+    {% if not perfil.eh_sindico %}<p class="sutil">Mudou de unidade? Fale com o síndico.</p>{% endif %}
+    <button type="submit" name="dados" class="botao botao-primario">Salvar</button>
+  </form>
+
+  <form method="post" class="cartao formulario">
+    {% csrf_token %}
+    <h2 class="cartao-titulo">Trocar senha</h2>
+    {{ form_senha.non_field_errors }}
+    {% for campo in form_senha %}
+      {% include "core/_campo.html" %}
+    {% endfor %}
+    <button type="submit" name="senha" class="botao">Trocar senha</button>
+  </form>
+</div>
+{% endblock %}

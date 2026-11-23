@@ -2,14 +2,14 @@ from django import forms
 from django.contrib import admin
 
 from .forms import validar_unidades
-from .models import Chamado, Condominio, Unidade
+from .models import Andamento, Chamado, Condominio, Perfil, Unidade
 
 admin.site.site_header = "CondoApp — administração"
 admin.site.site_title = "CondoApp"
 
 
 class UnidadeInline(admin.TabularInline):
-    """Permite só renomear as unidades geradas (ex.: "Bloco A - 101")."""
+    """Permite só renomear as unidades (ex.: "Bloco A - 101")."""
 
     model = Unidade
     extra = 0
@@ -19,15 +19,31 @@ class UnidadeInline(admin.TabularInline):
         return False
 
 
+class PerfilInline(admin.TabularInline):
+    model = Perfil
+    extra = 0
+    fields = ["usuario", "papel", "unidade", "telefone", "aprovado"]
+    raw_id_fields = ["usuario"]
+
+
 @admin.register(Condominio)
 class CondominioAdmin(admin.ModelAdmin):
-    list_display = ["nome", "endereco", "numero_unidades", "sindico_nome"]
-    search_fields = ["nome", "endereco", "sindico_nome"]
-    inlines = [UnidadeInline]
+    list_display = ["nome", "endereco", "numero_unidades", "criado_em"]
+    search_fields = ["nome", "endereco"]
+    readonly_fields = ["numero_unidades", "codigo_convite", "criado_em"]
+    inlines = [PerfilInline, UnidadeInline]
 
     def get_readonly_fields(self, request, obj=None):
-        # As unidades são geradas no cadastro; depois o número fica fixo.
-        return ["numero_unidades"] if obj else []
+        # No cadastro informa-se o número; depois ele acompanha as unidades.
+        return self.readonly_fields if obj else ["codigo_convite", "criado_em"]
+
+
+@admin.register(Perfil)
+class PerfilAdmin(admin.ModelAdmin):
+    list_display = ["nome", "papel", "condominio", "unidade", "aprovado"]
+    list_filter = ["papel", "aprovado", "condominio"]
+    search_fields = ["usuario__first_name", "usuario__last_name", "usuario__email"]
+    raw_id_fields = ["usuario"]
 
 
 class ChamadoAdminForm(forms.ModelForm):
@@ -37,10 +53,18 @@ class ChamadoAdminForm(forms.ModelForm):
         return dados
 
 
+class AndamentoInline(admin.TabularInline):
+    model = Andamento
+    extra = 0
+    fields = ["data", "tipo", "autor", "texto"]
+    readonly_fields = ["data"]
+
+
 @admin.register(Chamado)
 class ChamadoAdmin(admin.ModelAdmin):
     form = ChamadoAdminForm
-    list_display = ["id", "tipo", "condominio", "urgencia", "status", "solicitante_nome", "data_abertura"]
-    list_filter = ["status", "urgencia", "tipo", "condominio"]
+    list_display = ["id", "tipo", "local", "condominio", "urgencia", "status", "privado", "etapa", "data_abertura"]
+    list_filter = ["status", "urgencia", "tipo", "local", "privado", "etapa", "condominio"]
     search_fields = ["solicitante_nome", "descricao"]
-    filter_horizontal = ["unidades"]
+    filter_horizontal = ["unidades", "afetados"]
+    inlines = [AndamentoInline]

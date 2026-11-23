@@ -1,0 +1,41 @@
+{% load static %}<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aviso de convite · {{ condominio.nome }}</title>
+  <link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body class="pagina-impressao">
+  <div class="barra-impressao">
+    <a class="botao" href="{% url 'condominio' %}">← Voltar</a>
+    <button type="button" class="botao botao-primario" data-imprimir>Imprimir</button>
+  </div>
+
+  <article class="folha">
+    <p class="folha-sobre">{{ condominio.nome }}</p>
+    <h1>Registre as ocorrências do condomínio pelo celular</h1>
+    <p class="folha-texto">Barulho, vazamento, lâmpada queimada, portão com defeito: registre pelo CondoApp e acompanhe o atendimento. Quem reclama não fica exposto.</p>
+
+    <div class="folha-qrcode qrcode" data-qrcode="{{ link }}">
+      <span>Acesse o link abaixo</span>
+    </div>
+
+    <ol class="folha-passos">
+      <li>Aponte a câmera do celular para o código.</li>
+      <li>Preencha o seu nome, a sua unidade e uma senha.</li>
+      <li>Aguarde o síndico liberar o acesso.</li>
+    </ol>
+
+    <p class="folha-link">{{ link }}</p>
+
+    <div class="folha-rodape">
+      <strong>Não usa celular?</strong> Fale com o síndico, que registra a ocorrência por você.
+      {% for s in sindicos %}<br>{{ s.nome }}{% if s.telefone %} · {{ s.telefone }}{% endif %}{% endfor %}
+    </div>
+  </article>
+
+  <script src="{% static 'core/app.js' %}"></script>
+  {% include "core/_qrcode.html" %}
+</body>
+</html>
