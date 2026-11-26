@@ -1,22 +1,24 @@
-/* CondoApp — tema escuro, mobile-first. Único arquivo de estilo. */
+/* CondoApp — tema claro, mobile-first. Único arquivo de estilo. */
 
 :root {
-  color-scheme: dark;
-  --fundo: #0e1116;
-  --superficie: #161a22;
-  --superficie-2: #1e232d;
-  --borda: #2a303c;
-  --borda-forte: #3a4252;
-  --texto: #e7e9ee;
-  --texto-sutil: #9aa3b2;
-  --primaria: #7c9cff;
-  --primaria-hover: #97b1ff;
-  --primaria-texto: #0e1116;
-  --azul: #7c9cff;
-  --amarelo: #f2b84b;
-  --verde: #45d09e;
-  --vermelho: #ff7a7a;
-  --cinza: #8b93a1;
+  color-scheme: light;
+  --fundo: #f6f5f1;
+  --superficie: #ffffff;
+  --superficie-2: #efeee8;
+  --campo: #ffffff;
+  --borda: #e3e1d9;
+  --borda-forte: #c9c6bb;
+  --texto: #1f2421;
+  --texto-sutil: #66706a;
+  --primaria: #0f766e;
+  --primaria-hover: #0d625b;
+  --primaria-texto: #ffffff;
+  --primaria-suave: #e3f1ef;
+  --amarelo: #b45309;
+  --verde: #2f7d3b;
+  --vermelho: #c0392b;
+  --cinza: #6f7570;
+  --sombra: 0 1px 2px rgb(31 36 33 / 0.05), 0 2px 8px rgb(31 36 33 / 0.04);
   --raio: 14px;
 }
 
@@ -40,7 +42,7 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgb(14 17 22 / 0.88);
+  background: rgb(255 255 255 / 0.9);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--borda);
 }
@@ -70,8 +72,8 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
 
 .menu { display: flex; align-items: center; gap: 4px; }
 .menu a:not(.botao) { padding: 8px 12px; border-radius: 9px; color: var(--texto-sutil); font-weight: 500; }
-.menu a:not(.botao):hover,
-.menu a[aria-current="page"] { color: var(--texto); background: var(--superficie-2); }
+.menu a:not(.botao):hover { color: var(--texto); background: var(--superficie-2); }
+.menu a[aria-current="page"] { color: var(--primaria); background: var(--primaria-suave); }
 
 /* ---------- Página ---------- */
 
@@ -119,7 +121,7 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
   padding: 8px 16px;
   border: 1px solid var(--borda);
   border-radius: 10px;
-  background: var(--superficie-2);
+  background: var(--superficie);
   color: var(--texto);
   font: inherit;
   font-size: 0.95rem;
@@ -127,7 +129,7 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
   white-space: nowrap;
   cursor: pointer;
 }
-.botao:hover { border-color: var(--borda-forte); }
+.botao:hover { border-color: var(--borda-forte); background: var(--superficie-2); }
 .botao-primario { background: var(--primaria); border-color: var(--primaria); color: var(--primaria-texto); }
 .botao-primario:hover { background: var(--primaria-hover); border-color: var(--primaria-hover); }
 .botao-bloco { width: 100%; }
@@ -143,12 +145,13 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: var(--raio);
+  box-shadow: var(--sombra);
 }
 .lista-cartoes > .cartao { display: flex; flex-direction: column; }
 .lista-cartoes > .cartao .botao-bloco { margin-top: auto; }
 
 .cartao-link { display: block; height: 100%; color: inherit; transition: border-color 0.15s, transform 0.15s; }
-.cartao-link:hover { border-color: var(--borda-forte); transform: translateY(-1px); }
+.cartao-link:hover { border-color: var(--borda-forte); transform: translateY(-1px); box-shadow: 0 4px 14px rgb(31 36 33 / 0.08); }
 
 .cartao-titulo { margin: 4px 0 0; font-size: 1.05rem; }
 .cartao-topo,
@@ -181,7 +184,7 @@ h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em; 
 }
 .selo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-.status-aberto { --cor: var(--azul); }
+.status-aberto { --cor: var(--primaria); }
 .status-andamento { --cor: var(--amarelo); }
 .status-concluido { --cor: var(--verde); }
 .status-cancelado { --cor: var(--cinza); }
@@ -239,12 +242,12 @@ textarea {
   padding: 10px 12px;
   border: 1px solid var(--borda);
   border-radius: 10px;
-  background: var(--fundo);
+  background: var(--campo);
   color: var(--texto);
   font: inherit;
 }
 textarea { resize: vertical; }
-::placeholder { color: #6b7383; }
+::placeholder { color: #9aa09b; }
 input:focus,
 select:focus,
 textarea:focus {
@@ -279,7 +282,7 @@ textarea:focus {
   padding: 8px 10px;
   border: 1px solid var(--borda);
   border-radius: 10px;
-  background: var(--fundo);
+  background: var(--campo);
   font-weight: 500;
   cursor: pointer;
 }
@@ -349,7 +352,7 @@ input[type="radio"] { width: 16px; height: 16px; margin: 0; accent-color: var(--
   padding: 0 6px;
   border-radius: 999px;
   background: var(--amarelo);
-  color: var(--fundo);
+  color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -369,7 +372,7 @@ input[type="radio"] { width: 16px; height: 16px; margin: 0; accent-color: var(--
 }
 
 /* ---------- Botões extras ---------- */
-.botao-perigo { background: var(--vermelho); border-color: var(--vermelho); color: var(--fundo); }
+.botao-perigo { background: var(--vermelho); border-color: var(--vermelho); color: #fff; }
 .botao-perigo-contorno { color: var(--vermelho); border-color: color-mix(in srgb, var(--vermelho) 45%, transparent); background: transparent; }
 .botao-perigo-contorno:hover { border-color: var(--vermelho); }
 .acoes-esquerda { justify-content: flex-start; }
@@ -466,6 +469,7 @@ a.cartao-alerta { display: flex; flex-direction: column; gap: 2px; margin-bottom
   aspect-ratio: 1;
   padding: 10px;
   border-radius: 12px;
+  border: 1px solid var(--borda);
   background: #fff;
   color: #333;
   text-align: center;
@@ -487,7 +491,7 @@ a.cartao-alerta { display: flex; flex-direction: column; gap: 2px; margin-bottom
   font-weight: 700;
 }
 .passo-feito { color: var(--texto) !important; }
-.passo-feito .passo-marca { background: var(--verde); border-color: var(--verde); color: var(--fundo); }
+.passo-feito .passo-marca { background: var(--verde); border-color: var(--verde); color: #fff; }
 
 /* ---------- Unidades e moradores ---------- */
 .lista-unidades, .lista-pessoas { list-style: none; margin: 10px 0 0; padding: 0; }
@@ -515,7 +519,7 @@ textarea[name="identificadores"] { font-family: ui-monospace, Consolas, monospac
 }
 
 /* ---------- Aviso impresso com QR Code ---------- */
-.pagina-impressao { background: #e9ebef; color: #111; }
+.pagina-impressao { background: var(--fundo); color: #111; }
 .barra-impressao { display: flex; justify-content: center; gap: 10px; padding: 16px; }
 .barra-impressao .botao:not(.botao-primario) { background: #fff; color: #111; border-color: #c8ccd4; }
 .folha {
@@ -528,7 +532,7 @@ textarea[name="identificadores"] { font-family: ui-monospace, Consolas, monospac
   font-size: 1.2rem;
 }
 .folha h1 { font-size: 2.1rem; line-height: 1.2; color: #111; }
-.folha-sobre { margin: 0 0 10px; color: #3d4b8a; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 1rem; }
+.folha-sobre { margin: 0 0 10px; color: #0f766e; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 1rem; }
 .folha-texto { margin: 14px auto 24px; max-width: 34em; color: #333; }
 .folha-qrcode { width: 280px; margin: 0 auto; border: 2px solid #111; }
 .folha-passos { display: inline-grid; gap: 10px; margin: 24px auto 10px; padding-left: 1.4em; text-align: left; font-size: 1.35rem; }
